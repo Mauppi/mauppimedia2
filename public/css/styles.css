@@ -1,0 +1,35 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    color: white;
+}
+
+.audio-player {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url("/static/img/songcovers/SANNI/cover.jpg");
+    background-size: cover;
+    background-position: 50%;
+}
+
+.bottom-gradient {
+    position: absolute;
+    bottom: 0;
+    background-image: linear-gradient(to top, black, transparent);
+    height: 70vw;
+    width: 100%;
+}
+
+.player-play {
+    display: inline-block;
+    background-color: whitesmoke;
+    border-radius: 3vh;
+    width: 10vh;
+    height: 10vh;
+    position: inherit;
+    bottom: 0;
+    margin-left: 8vw;
+    margin-bottom: 5vh;
+}

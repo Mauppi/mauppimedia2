@@ -7,22 +7,27 @@ const { body, validationResult } = require('express-validator');
 var fileupload = require("express-fileupload");
 app.use(fileupload());
 
+app.set('view engine', 'ejs');
+
 const db = new sqlite3.Database("./database.db", sqlite3.OPEN_READWRITE, (err) => {
     if (err) return console.error(err.message);
 
     console.log("Connection established to database");
 });
 
-db.run("CREATE TABLE IF NOT EXISTS songs (id INTEGER PRIMARY KEY, title VARCHAR(255) NOT NULL, artist VARCHAR(255) NOT NULL, album VARCHAR(255) NOT NULL, audio_path VARCHAR(255) NOT NULL, image_path VARCHAR(255) NOT NULL, streams INTEGER DEFAULT 0)");
+db.run("CREATE TABLE IF NOT EXISTS songs (id VARCHAR(255) PRIMARY KEY, title VARCHAR(255) NOT NULL, artist VARCHAR(255) NOT NULL, album VARCHAR(255) NOT NULL, audio_path VARCHAR(255) NOT NULL, image_path VARCHAR(255) NOT NULL, streams INTEGER DEFAULT 0)");
+
 
 app.use("/static", express.static('public'));
 
 app.get("/", function (req, res) {
-    res.sendFile(__dirname + "/views/index.html");
+    db.all("SELECT * FROM songs LIMIT 15 ORDER RANDOM", function (err, rows) {
+        res.render("index", {songs: rows});
+    });
 });
 
 app.get("/create/song", function (req, res) {
-    res.sendFile(__dirname + "/views/create/song.html");
+    res.render("create/song");
 });
 
 app.post("/create/song", body("title").not().isEmpty().escape(), body("artist").not().isEmpty().escape(), body("album").not().isEmpty().escape(), function (req, res) {
@@ -46,16 +51,31 @@ app.post("/create/song", body("title").not().isEmpty().escape(), body("artist").
 });
 
 app.get("/listen", function (req, res) {
-    res.sendFile(__dirname + "/views/listen.html");
+    if (!req.query.song)
+        res.redirect("/");
+    
+    db.get("SELECT 1 FROM songs WHERE song_id=?", req.query.song, function (err, row) {
+        if (!row) res.redirect("/");
+
+        res.render("listen", {
+            title: row.title,
+            artist: row.artist,
+            album: row.album,
+            id: row.id
+        });
+    });
 });
 
-app.get("/api/audio", function (req, res) {
+app.get("/api/audio/:id", function (req, res) {
     const range = req.headers.range;
+    if (!fs.existsSync("music/" + toString(req.params.id) + ".mp3")) {
+        return console.log("File" + req.params.id +".mp3 does not exist.");
+    }
     if (!range) {
         res.status(400).send("Requires Range header");
     }
-    const audioPath = "music/psykanv4.mp3";
-    const audioSize = fs.statSync("music/psykanv4.mp3").size;
+    const audioPath = "music/" + toString(req.params.id) + ".mp3";
+    const audioSize = fs.statSync("music/" + toString(req.params.id) + ".mp3").size;
     const CHUNK_SIZE = 10 ** 6;
     const start = Number(range.replace(/\D/g, ""));
     const end = Math.min(start + CHUNK_SIZE, audioSize - 1);
@@ -75,6 +95,6 @@ app.listen(8000, function () {
     console.log('listening on port 8000');
 });
 
-db.close((err) => {
+/*db.close((err) => {
     if (err) return console.error(err.message);
-});
+});*/

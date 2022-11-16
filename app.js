@@ -4,7 +4,10 @@ const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
 const { v4: uuidv4 } = require('uuid');
 const { body, validationResult } = require('express-validator');
+const sharp = require('sharp');
 var fileupload = require("express-fileupload");
+const { exec } = require('child_process');
+const { stderr } = require('process');
 app.use(fileupload());
 
 app.set('view engine', 'ejs');
@@ -21,7 +24,8 @@ db.run("CREATE TABLE IF NOT EXISTS songs (id VARCHAR(255) PRIMARY KEY, title VAR
 app.use("/static", express.static('public'));
 
 app.get("/", function (req, res) {
-    db.all("SELECT * FROM songs LIMIT 15 ORDER RANDOM", function (err, rows) {
+    db.all("SELECT * FROM songs LIMIT 15", function (err, rows) {
+        console.log(toString(rows));
         res.render("index", {songs: rows});
     });
 });
@@ -41,10 +45,22 @@ app.post("/create/song", body("title").not().isEmpty().escape(), body("artist").
         return res.send("Cover File invalid!");
     }
     var uniqueID = uuidv4();
-    var songFilePath = "./music/" + uniqueID + "." + songFile.name.split('.').pop();
-    var coverFilePath = "./public/img/songcovers/" + uniqueID + "." +  coverFile.name.split('.').pop();
-    songFile.mv(songFilePath);
-    coverFile.mv(coverFilePath);
+    var songFilePath = "./tempmusic/" + uniqueID + "." + songFile.name.split('.').pop();
+    var fsongFilePath = "./music/" + uniqueID + "." + songFile.name.split('.').pop();
+    var coverFilePath = "./tempcover/" + uniqueID + "." +  coverFile.name.split('.').pop();
+    var fcoverFilePath = "./public/img/songcovers/" + uniqueID + ".png";
+    songFile.mv(songFilePath, (err) => {
+        if (err) return console.log(toString(err));
+        exec("ffmpeg.exe -i \"" + songFilePath +"\" -c:v libx264 -ar 44100 -rematrix_maxval 1.0 -ac 2 -b:a 256k -af \"volume=0.8,acontrast=0.44\" \"" + fsongFilePath + "\"", stderr => (err) => {
+            if (err) return console.log(toString(err));
+        });
+    });
+    coverFile.mv(coverFilePath, (err) => {
+        if (err) return console.log(toString(err));
+        sharp(coverFilePath).resize(2200).png().toFile(fcoverFilePath).catch(err => {
+            if (err) return console.log(toString(err));
+        });
+    });
     db.run("INSERT INTO songs (id, title, artist, album, audio_path, image_path) VALUES (?, ?, ?, ?, ?, ?)", uniqueID, req.body.title, req.body.artist, req.body.album, songFilePath, coverFilePath);
     console.log("A new song was uploaded with uuid: " + toString(uniqueID) + " and name of: " + req.body.title + ". Song File path: " + songFilePath + ", Cover File path: " + coverFilePath);
     res.redirect("/");
@@ -52,10 +68,10 @@ app.post("/create/song", body("title").not().isEmpty().escape(), body("artist").
 
 app.get("/listen", function (req, res) {
     if (!req.query.song)
-        res.redirect("/");
+        return res.redirect("/");
     
-    db.get("SELECT 1 FROM songs WHERE song_id=?", req.query.song, function (err, row) {
-        if (!row) res.redirect("/");
+    db.get("SELECT * FROM songs WHERE id=?", req.query.song, function (err, row) {
+        if (!row) return res.redirect("/");
 
         res.render("listen", {
             title: row.title,
@@ -66,15 +82,24 @@ app.get("/listen", function (req, res) {
     });
 });
 
-app.get("/api/audio/:id", function (req, res) {
+app.get("/api/audio/:di", function (req, res) {
     const range = req.headers.range;
-    if (!fs.existsSync("music/" + toString(req.params.id) + ".mp3")) {
-        return console.log("File" + req.params.id +".mp3 does not exist.");
+    if (!req.params.di)
+        return res.status(400).send("Requires Param header");
+    var pathi = "./music/" + toString(req.params.di) + ".mp3";
+    console.log(req.params);
+    console.log(pathi);
+    try {
+        fs.accessSync(pathi);
+    }
+    catch(err) {
+        res.redirect("/");
+        return console.log("File music/" + req.params.di +".mp3 does not exist. Err" + err);
     }
     if (!range) {
-        res.status(400).send("Requires Range header");
+        return res.status(400).send("Requires Range header");
     }
-    const audioPath = "music/" + toString(req.params.id) + ".mp3";
+    const audioPath = "music/" + toString(req.params.di) + ".mp3";
     const audioSize = fs.statSync("music/" + toString(req.params.id) + ".mp3").size;
     const CHUNK_SIZE = 10 ** 6;
     const start = Number(range.replace(/\D/g, ""));

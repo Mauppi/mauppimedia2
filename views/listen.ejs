@@ -22,10 +22,15 @@
         <audio id="music">
             <source src="/api/audio/<%= id %>" type="audio/mpeg">
         </audio>
-        <div class="audio-player">
+        <div class="audio-player" style="background-image: url('<%= img %>');">
             <div class="bottom-gradient">
-                <button class="player-play" onclick="startMusic()"></button>
+                <div class="bottom-controls">
+                    <h1 class="song-title"><%= artist %> - <%= title %> </h1>
+                    <button class="player-play" onclick="startMusic()">Play</button>
+                    <progress class="player-progress" id="player-prog" value="0" max="100">0:00</progress>
+                </div>
             </div>
+            <a class="home-a" href="/"><- Go Home</a>
         </div>
 
     </body>

@@ -3,13 +3,18 @@ body {
     padding: 0;
     background-color: black;
     color: white;
+    text-decoration: none;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+a {
+    color: white;
 }
 
 .audio-player {
     position: absolute;
     width: 100%;
     height: 100%;
-    background-image: url("/static/img/songcovers/SANNI/cover.jpg");
     background-size: cover;
     background-position: 50%;
 }
@@ -18,18 +23,52 @@ body {
     position: absolute;
     bottom: 0;
     background-image: linear-gradient(to top, black, transparent);
-    height: 70vw;
+    height: 60vw;
     width: 100%;
+    color:white;
+    font-size: 3vmax;
+}
+
+.song-title {
+    position: inherit;
+    width: 100%;
+    bottom: 15vh;
+    margin-top: 5vh;
+    text-align: center;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .player-play {
-    display: inline-block;
     background-color: whitesmoke;
     border-radius: 3vh;
     width: 10vh;
     height: 10vh;
+    margin-left: 20vw;
+}
+
+.player-progress {
+    display: inline-block;
+    background-color: whitesmoke;
+    border-radius: 0vh;
+    width: 35vh;
+    height: 3vh;
+    margin-left: 2vw;
+}
+
+.bottom-controls {
+    width: 100%;
+    height: 20vh;
+    padding-top: 2vh;
     position: inherit;
     bottom: 0;
-    margin-left: 8vw;
-    margin-bottom: 5vh;
+}
+
+.home-a {
+    position:inherit;
+    left: 0;
+    top: 0;
+    color:white;
+    margin: 1.5vmax;
+    font-size: large;
 }

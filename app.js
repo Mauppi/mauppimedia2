@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const fs = require('fs');
+const bodyParser = require("body-parser");
 const sqlite3 = require('sqlite3').verbose();
 const { v4: uuidv4 } = require('uuid');
 const { body, validationResult } = require('express-validator');
@@ -22,6 +23,12 @@ db.run("CREATE TABLE IF NOT EXISTS songs (id VARCHAR(255) PRIMARY KEY, title VAR
 
 
 app.use("/static", express.static('public'));
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
 
 app.get("/", function (req, res) {
     db.all("SELECT * FROM songs LIMIT 15", function (err, rows) {
@@ -51,18 +58,18 @@ app.post("/create/song", body("title").not().isEmpty().escape(), body("artist").
     var fcoverFilePath = "./public/img/songcovers/" + uniqueID + ".png";
     songFile.mv(songFilePath, (err) => {
         if (err) return console.log(toString(err));
-        exec("ffmpeg.exe -i \"" + songFilePath +"\" -c:v libx264 -ar 44100 -rematrix_maxval 1.0 -ac 2 -b:a 256k -af \"volume=0.8,acontrast=0.44\" \"" + fsongFilePath + "\"", stderr => (err) => {
+        exec("ffmpeg.exe -i \"" + songFilePath +"\" -c:v libx264 -ar 44100 -rematrix_maxval 1.0 -ac 2 -b:a 256k -af \"volume=0.55,acontrast=0.45\" \"" + fsongFilePath + "\"", stderr => (err) => {
             if (err) return console.log(toString(err));
         });
     });
     coverFile.mv(coverFilePath, (err) => {
         if (err) return console.log(toString(err));
-        sharp(coverFilePath).resize(2200).png().toFile(fcoverFilePath).catch(err => {
+        sharp(coverFilePath).resize(1000).png().toFile(fcoverFilePath).catch(err => {
             if (err) return console.log(toString(err));
         });
     });
-    db.run("INSERT INTO songs (id, title, artist, album, audio_path, image_path) VALUES (?, ?, ?, ?, ?, ?)", uniqueID, req.body.title, req.body.artist, req.body.album, songFilePath, coverFilePath);
-    console.log("A new song was uploaded with uuid: " + toString(uniqueID) + " and name of: " + req.body.title + ". Song File path: " + songFilePath + ", Cover File path: " + coverFilePath);
+    db.run("INSERT INTO songs (id, title, artist, album, audio_path, image_path) VALUES (?, ?, ?, ?, ?, ?)", uniqueID, req.body.title, req.body.artist, req.body.album, fsongFilePath, fcoverFilePath);
+    console.log("A new song was uploaded with uuid: " + toString(uniqueID) + " and name of: " + req.body.title + ". Song File path: " + fsongFilePath + ", Cover File path: " + fcoverFilePath);
     res.redirect("/");
 });
 
@@ -73,11 +80,17 @@ app.get("/listen", function (req, res) {
     db.get("SELECT * FROM songs WHERE id=?", req.query.song, function (err, row) {
         if (!row) return res.redirect("/");
 
+        var coverPathi = row.image_path
+
+        coverPathi = coverPathi.slice(1);
+        coverPathi = coverPathi.replace("public", "static");
+
         res.render("listen", {
             title: row.title,
             artist: row.artist,
             album: row.album,
-            id: row.id
+            id: row.id,
+            img: coverPathi
         });
     });
 });
@@ -86,7 +99,7 @@ app.get("/api/audio/:di", function (req, res) {
     const range = req.headers.range;
     if (!req.params.di)
         return res.status(400).send("Requires Param header");
-    var pathi = "./music/" + toString(req.params.di) + ".mp3";
+    var pathi = "./music/" + req.params.di + ".mp3";
     console.log(req.params);
     console.log(pathi);
     try {
@@ -99,8 +112,8 @@ app.get("/api/audio/:di", function (req, res) {
     if (!range) {
         return res.status(400).send("Requires Range header");
     }
-    const audioPath = "music/" + toString(req.params.di) + ".mp3";
-    const audioSize = fs.statSync("music/" + toString(req.params.id) + ".mp3").size;
+    const audioPath = "music/" + req.params.di + ".mp3";
+    const audioSize = fs.statSync("music/" + req.params.di + ".mp3").size;
     const CHUNK_SIZE = 10 ** 6;
     const start = Number(range.replace(/\D/g, ""));
     const end = Math.min(start + CHUNK_SIZE, audioSize - 1);

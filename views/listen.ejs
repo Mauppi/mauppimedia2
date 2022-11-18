@@ -27,7 +27,7 @@
                 <div class="bottom-controls">
                     <h1 class="song-title"><%= artist %> - <%= title %> </h1>
                     <button class="player-play" onclick="startMusic()">Play</button>
-                    <progress class="player-progress" id="player-prog" value="0" max="100">0:00</progress>
+                    <input type="range" class="player-progress" id="player-prog" onchange="music.fastSeek(progress.value)" value="0" max="100"><p id="player-prog-text"></p>
                 </div>
             </div>
             <a class="home-a" href="/"><- Go Home</a>

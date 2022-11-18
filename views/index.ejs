@@ -17,15 +17,24 @@
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-        <a href="/create/song">Create song!</a>
-        <% if (songs) { %> 
-        <ul>
-            <% songs.forEach(function(song) {%>
-                <li>
-                    <a href="/listen?song=<%= song.id %>"><%= song.artist %> - <%= song.title %></a>
-                </li>
-            <% }) %> 
-        </ul>
-        <% } %> 
+        <div class="head-panel">
+            <h2 class="head-panel-title">MauppiMedia</h2>
+            <a class="head-panel-link" href="/">Home</a>
+            <a class="head-panel-link" href="/create/song">Create song!</a>
+        </div>
+        <div class="content">
+            <% if (songs) { %> 
+            <ul>
+                <% songs.forEach(function(song) {%>
+                    <li>
+                        <a href="/listen?song=<%= song.id %>"><%= song.artist %> - <%= song.title %></a>
+                    </li>
+                <% }) %> 
+            </ul>
+            <% } %> 
+        </div>
+        <div class="footer">
+            <p>Made by Mauppi while taking a huge shit, 2022</p>
+        </div>
     </body>
 </html>

@@ -32,7 +32,6 @@ app.use(bodyParser.json())
 
 app.get("/", function (req, res) {
     db.all("SELECT * FROM songs LIMIT 15", function (err, rows) {
-        console.log(toString(rows));
         res.render("index", {songs: rows});
     });
 });

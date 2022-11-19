@@ -45,6 +45,16 @@ a {
     width: 10vh;
     height: 10vh;
     margin-left: 25vw;
+    vertical-align: middle;
+    transition: 100ms;
+}
+
+.player-play:hover {
+    filter: brightness(90%);
+}
+
+.player-play:active {
+    filter: brightness(70%);
 }
 
 .player-progress {
@@ -53,11 +63,12 @@ a {
     border-radius: 5vh;
     width: 35vh;
     height: 5vh;
-    margin-left: 2vw;
+    margin-left: 4vw;
     appearance: none;
     outline: none;
     transition: 100ms;
     cursor: pointer;
+    vertical-align: middle;
 }
 
 .player-progress::-webkit-slider-thumb {
@@ -81,7 +92,8 @@ a {
 .player-prog-p {
     font-size: larger;
     display: inline-block;
-    margin-left: 5vw;
+    margin-left: 1vw;
+    vertical-align: middle;
 }
 
 .bottom-controls {
@@ -156,6 +168,28 @@ a {
     text-align: center;
 }
 
+.player-rating-area {
+    position: inherit;
+    bottom: 0;
+    z-index: 1;
+    width: 100%;
+}
+
+.rating-star {
+    width: 10vw;
+    height: 10vw;
+    margin-left: 4vw;
+    transition: 100ms;
+}
+
+.rating-star:hover {
+    filter: brightness(70%);
+}
+
+.rating-star:first-of-type {
+    margin-left: 14vw;
+}
+
 @media only screen and (max-width: 768px) {
     .head-panel {
         height: 20vmin;
@@ -177,6 +211,8 @@ a {
 
     .player-prog-p {
         font-size: normal;
+        text-align: center;
+        width: 100%;
     }
 
     .player-progress::-webkit-slider-thumb {
@@ -187,5 +223,15 @@ a {
     .player-progress::-moz-range-thumb {
         width: 10vw;
         height: 10vw;
+    }
+
+    .rating-star {
+        width: 13vw;
+        height: 13vw;
+        margin-left: 5vw;
+    }
+    
+    .rating-star:first-of-type {
+        margin-left: 5vw;
     }
 }

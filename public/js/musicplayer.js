@@ -44,7 +44,6 @@ setInterval(() => {
     }, 1000);
 
 setInterval(() => {
-    if (sound.readyState == 4)
     progresst.innerHTML = Math.floor(sound.seek() / 60) + ":" + parseInt(sound.seek() - Math.floor(sound.seek() / 60) * 60) + "/" + Math.floor(sound.duration() / 60) + ":" + parseInt(sound.duration() - Math.floor(sound.duration() / 60) * 60) + "";
 }, 250);
 

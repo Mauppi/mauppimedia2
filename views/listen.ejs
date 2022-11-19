@@ -12,7 +12,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
         <link rel="stylesheet" href="/static/css/styles.css">
-        <script src="" async defer></script>
+        <script src="/static/js/rating.js" defer></script>
         <script src="/static/js/howler/howler.min.js"></script>
         <script src="/static/js/musicplayer.js" async defer></script>
     </head>
@@ -32,7 +32,15 @@
                 <div class="bottom-controls">
                     <h1 class="song-title"><%= artist %> - <%= title %> </h1>
                     <button class="player-play" onclick="startMusic()">Play</button>
-                    <input type="range" class="player-progress" id="player-prog"  oninput="seektime()" value="0" max="100"><p class="player-prog-p" id="player-prog-text"></p>
+                    <input type="range" class="player-progress" id="player-prog"  oninput="seektime()" value="0" max="100">
+                    <p class="player-prog-p" id="player-prog-text"></p>
+                </div>
+                <div class="player-rating-area">
+                    <img class="rating-star" id="rstar0" onclick="clickStar(0)" src="/static/img/rating/star_gray.png">
+                    <img class="rating-star" id="rstar1" onclick="clickStar(1)" src="/static/img/rating/star_gray.png">
+                    <img class="rating-star" id="rstar2" onclick="clickStar(2)" src="/static/img/rating/star_gray.png">
+                    <img class="rating-star" id="rstar3" onclick="clickStar(3)" src="/static/img/rating/star_gray.png">
+                    <img class="rating-star" id="rstar4" onclick="clickStar(4)" src="/static/img/rating/star_gray.png">
                 </div>
             </div>
             <a class="home-a" href="/"><- Go Home</a>

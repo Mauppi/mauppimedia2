@@ -145,9 +145,9 @@ a {
 }
 
 .footer {
-    position: absolute;
+    position: fixed;
     bottom: 0;
-    height: 10vh;
+    height: 5vh;
     margin-top: 5vh;
     background-color: black;
     color: white;

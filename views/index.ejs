@@ -25,13 +25,14 @@
         </div>
         <div class="content">
             <% if (songs) { %> 
-            <ul>
+            <ol>
                 <% songs.forEach(function(song) {%>
+                    <img src="<%= song.image_path %>" style="width: 15vmax; height: 15vmax; cursor: pointer;" onclick="window.location.assign('/listen?song=<%= song.id %>')">
                     <li>
                         <a href="/listen?song=<%= song.id %>"><%= song.artist %> - <%= song.title %></a>
                     </li>
                 <% }) %> 
-            </ul>
+            </ol>
             <% } %> 
         </div>
         <div class="footer">

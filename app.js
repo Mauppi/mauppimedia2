@@ -9,7 +9,19 @@ const sharp = require('sharp');
 var fileupload = require("express-fileupload");
 const { exec } = require('child_process');
 const { stderr } = require('process');
+const passport = require("passport");
+const rateLimit = require('express-rate-limit');
+
 app.use(fileupload());
+
+const apiRateConf = rateLimit({
+    windowMs: 2 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false
+});
+
+app.use("/api", apiRateConf);
 
 app.set('view engine', 'ejs');
 
@@ -19,7 +31,7 @@ const db = new sqlite3.Database("./database.db", sqlite3.OPEN_READWRITE, (err) =
     console.log("Connection established to database");
 });
 
-db.run("CREATE TABLE IF NOT EXISTS songs (id VARCHAR(255) PRIMARY KEY, title VARCHAR(255) NOT NULL, artist VARCHAR(255) NOT NULL, album VARCHAR(255) NOT NULL, audio_path VARCHAR(255) NOT NULL, image_path VARCHAR(255) NOT NULL, streams INTEGER DEFAULT 0)");
+db.run("CREATE TABLE IF NOT EXISTS songs (id VARCHAR(255) PRIMARY KEY, title VARCHAR(255) NOT NULL, artist VARCHAR(255) NOT NULL, album VARCHAR(255) NOT NULL, audio_path VARCHAR(255) NOT NULL, image_path VARCHAR(255) NOT NULL, streams INTEGER DEFAULT 0, score INTEGER DEFAULT 10)");
 
 
 app.use("/static", express.static('public'));
@@ -30,9 +42,27 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
+setInterval(() => {
+    db.run("UPDATE songs SET score=score-15");
+    console.log("Score substracted!");
+}, 350000);
+
 app.get("/", function (req, res) {
-    db.all("SELECT * FROM songs LIMIT 15", function (err, rows) {
-        res.render("index", {songs: rows});
+    db.all("SELECT * FROM songs ORDER BY score LIMIT 15 ", function (err, rows) {
+        console.log("err: " + err + "\nrows: " + rows);
+
+        var rowit = [];
+        rows.forEach(row => {
+            
+            var coverPathi = row.image_path
+
+            coverPathi = coverPathi.slice(1);
+            coverPathi = coverPathi.replace("public", "static");
+
+            row.image_path = coverPathi
+        });
+
+        res.render("index", {songs: rows.reverse()});
     });
 });
 
@@ -84,6 +114,8 @@ app.get("/listen", function (req, res) {
         coverPathi = coverPathi.slice(1);
         coverPathi = coverPathi.replace("public", "static");
 
+        db.run("UPDATE songs SET score=score+1 WHERE id='" + row.id + "'");
+
         res.render("listen", {
             title: row.title,
             artist: row.artist,
@@ -92,6 +124,16 @@ app.get("/listen", function (req, res) {
             img: coverPathi
         });
     });
+});
+
+app.post("/api/listenscore/:di/:sc", function(req, res) {
+    if (!req.params.di || !req.params.sc) return;
+    if (req.params.sc > 30) return;
+
+    db.run("UPDATE songs SET score=score+1 WHERE id='" + req.params.di + "'");
+
+    console.log("Score Update listen received");
+
 });
 
 app.get("/api/audio/:di", function (req, res) {

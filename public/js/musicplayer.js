@@ -2,6 +2,9 @@ var progress = document.getElementById("player-prog");
 var progresst = document.getElementById("player-prog-text");
 var justSeeked = true;
 var wasMusicPlaying = false;
+var scoreUpdater = new XMLHttpRequest();
+var id
+var howmanyscorestosend = 0;
 
 function startMusic() {
     if (!sound.playing()) {
@@ -34,11 +37,20 @@ sound.on("seek", function seekingkku() {
 
 setInterval(() => {
     progress.max = sound.duration();
-    if (!sound.seeking && !justSeeked) {
-        progress.value = sound.seek();
-    }}, 1000);
+    progress.value = sound.seek();
+    if (sound.playing()) {
+        howmanyscorestosend += 1
+    }
+    }, 1000);
 
 setInterval(() => {
     if (sound.readyState == 4)
     progresst.innerHTML = Math.floor(sound.seek() / 60) + ":" + parseInt(sound.seek() - Math.floor(sound.seek() / 60) * 60) + "/" + Math.floor(sound.duration() / 60) + ":" + parseInt(sound.duration() - Math.floor(sound.duration() / 60) * 60) + "";
 }, 250);
+
+setInterval(() => {
+    scoreUpdater.open("POST", "/api/listenscore/" + id + "/" + howmanyscorestosend, true);
+    scoreUpdater.send();
+    console.log(howmanyscorestosend);
+    howmanyscorestosend = 0;
+}, 20000);

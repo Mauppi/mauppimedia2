@@ -44,7 +44,7 @@ app.post("/create/song", body("title").not().isEmpty().escape(), body("artist").
     console.log(req.files);
     var songFile = req.files.song_file
     var coverFile = req.files.cover_file
-    if (songFile.mimetype != "audio/mpeg" || songFile.size >= 10000000) {
+    if (songFile.mimetype != "audio/mpeg" && songFile.mimetype != "audio/x-flac" && songFile.mimetype != "audio/wav" && songFile.size >= 10000000) {
         return res.send("Song File invalid!");
     }
     if (coverFile.mimetype != "image/jpeg" && coverFile.mimetype != "image/png" || coverFile.size >= 10000000) {
@@ -52,7 +52,7 @@ app.post("/create/song", body("title").not().isEmpty().escape(), body("artist").
     }
     var uniqueID = uuidv4();
     var songFilePath = "./tempmusic/" + uniqueID + "." + songFile.name.split('.').pop();
-    var fsongFilePath = "./music/" + uniqueID + "." + songFile.name.split('.').pop();
+    var fsongFilePath = "./music/" + uniqueID + ".mp3";
     var coverFilePath = "./tempcover/" + uniqueID + "." +  coverFile.name.split('.').pop();
     var fcoverFilePath = "./public/img/songcovers/" + uniqueID + ".png";
     songFile.mv(songFilePath, (err) => {

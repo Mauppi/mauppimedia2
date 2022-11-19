@@ -12,7 +12,7 @@ function startMusic() {
 }
 
 function seektime() {
-    wasMusicPlaying = !sound.paused
+    wasMusicPlaying = sound.playing()
     sound.pause();
     sound.seek(progress.value);
     justSeeked = true;

@@ -1,21 +1,44 @@
-var music = document.getElementById('music');
 var progress = document.getElementById("player-prog");
 var progresst = document.getElementById("player-prog-text");
+var justSeeked = true;
+var wasMusicPlaying = false;
 
 function startMusic() {
-    if (music.paused) {
-        music.play();
+    if (!sound.playing()) {
+        sound.play();
     } else {
-        music.pause();
+        sound.pause();
     }
 }
 
+function seektime() {
+    wasMusicPlaying = !sound.paused
+    sound.pause();
+    sound.seek(progress.value);
+    justSeeked = true;
+}
+
+function onmload() {
+    if (justSeeked) {
+        sound.play();
+    }
+    justSeeked = false;
+}
+
+
+sound.on("seek", function seekingkku() {
+    if (wasMusicPlaying) {
+        sound.play();
+    }
+});
+
 setInterval(() => {
-    progress.max = music.duration;
-    if (!music.seeking) {
-        progress.value = music.currentTime;
+    progress.max = sound.duration();
+    if (!sound.seeking && !justSeeked) {
+        progress.value = sound.seek();
     }}, 1000);
 
 setInterval(() => {
-    progresst.innerHTML = Math.floor(music.currentTime / 60) + ":" + parseInt(music.currentTime - Math.floor(music.currentTime / 60) * 60) + "/" + Math.floor(music.duration / 60) + ":" + parseInt(music.duration - Math.floor(music.duration / 60) * 60) + "";
+    if (sound.readyState == 4)
+    progresst.innerHTML = Math.floor(sound.seek() / 60) + ":" + parseInt(sound.seek() - Math.floor(sound.seek() / 60) * 60) + "/" + Math.floor(sound.duration() / 60) + ":" + parseInt(sound.duration() - Math.floor(sound.duration() / 60) * 60) + "";
 }, 250);

@@ -96,8 +96,10 @@ app.get("/listen", function (req, res) {
 
 app.get("/api/audio/:di", function (req, res) {
     const range = req.headers.range;
-    if (!req.params.di)
+    if (!req.params.di) {
+        console.log("req param head");
         return res.status(400).send("Requires Param header");
+    }
     var pathi = "./music/" + req.params.di + ".mp3";
     console.log(req.params);
     console.log(pathi);
@@ -109,6 +111,7 @@ app.get("/api/audio/:di", function (req, res) {
         return console.log("File music/" + req.params.di +".mp3 does not exist. Err" + err);
     }
     if (!range) {
+        console.log("req range head");
         return res.status(400).send("Requires Range header");
     }
     const audioPath = "music/" + req.params.di + ".mp3";

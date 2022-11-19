@@ -12,22 +12,25 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="/static/css/styles.css">
         <script src="" async defer></script>
+        <script src="/static/js/howler/howler.min.js"></script>
         <script src="/static/js/musicplayer.js" async defer></script>
     </head>
     <body>
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-        
-        <audio id="music">
-            <source src="/api/audio/<%= id %>" type="audio/mpeg">
-        </audio>
+        <script>
+            var sound = new Howl({
+                src: ['/api/audio/<%= id %>'],
+                html5: true
+            });
+        </script>
         <div class="audio-player" style="background-image: url('<%= img %>');">
             <div class="bottom-gradient">
                 <div class="bottom-controls">
                     <h1 class="song-title"><%= artist %> - <%= title %> </h1>
                     <button class="player-play" onclick="startMusic()">Play</button>
-                    <input type="range" class="player-progress" id="player-prog" onchange="music.fastSeek(progress.value)" value="0" max="100"><p id="player-prog-text"></p>
+                    <input type="range" class="player-progress" id="player-prog"  oninput="seektime()" value="0" max="100"><p class="player-prog-p" id="player-prog-text"></p>
                 </div>
             </div>
             <a class="home-a" href="/"><- Go Home</a>

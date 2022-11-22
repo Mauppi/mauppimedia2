@@ -174,7 +174,7 @@ app.get("/api/audio/:di", function (req, res) {
 });
 
 app.listen(8000, function () {
-    console.log('listening on port 8000');
+    console.log('main listening on port 8000');
 });
 
 /*db.close((err) => {

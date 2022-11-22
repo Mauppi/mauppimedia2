@@ -37,10 +37,10 @@ db.run("CREATE TABLE IF NOT EXISTS songs (id VARCHAR(255) PRIMARY KEY, title VAR
 app.use("/static", express.static('public'));
 
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // parse application/json
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
 setInterval(() => {
     db.run("UPDATE songs SET score=score-15");

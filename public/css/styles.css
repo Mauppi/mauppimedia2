@@ -32,7 +32,7 @@ a {
 .song-title {
     position: inherit;
     width: 100%;
-    bottom: 20vh;
+    bottom: 25vh;
     margin-top: 5vh;
     text-align: center;
     left: 50%;
@@ -176,9 +176,9 @@ a {
 }
 
 .rating-star {
-    width: 10vw;
-    height: 10vw;
-    margin-left: 4vw;
+    width: 5vw;
+    height: 5vw;
+    margin-left: 1vw;
     transition: 100ms;
 }
 

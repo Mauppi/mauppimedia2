@@ -87,7 +87,7 @@ app.post("/create/song", body("title").not().isEmpty().escape(), body("artist").
     var fcoverFilePath = "./public/img/songcovers/" + uniqueID + ".png";
     songFile.mv(songFilePath, (err) => {
         if (err) return console.log(toString(err));
-        exec("ffmpeg.exe -i \"" + songFilePath +"\" -c:v libx264 -ar 44100 -rematrix_maxval 1.0 -ac 2 -b:a 256k -af \"volume=0.55,acontrast=0.45\" \"" + fsongFilePath + "\"", stderr => (err) => {
+        exec("ffmpeg -i \"" + songFilePath +"\" -c:v libx264 -ar 44100 -rematrix_maxval 1.0 -ac 2 -b:a 256k -af \"volume=0.55,acontrast=0.45\" \"" + fsongFilePath + "\"", stderr => (err) => {
             if (err) return console.log(toString(err));
         });
     });

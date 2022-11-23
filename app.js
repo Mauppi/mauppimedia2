@@ -45,7 +45,7 @@ app.use(bodyParser.json());
 setInterval(() => {
     db.run("UPDATE songs SET score=score-15");
     console.log("Score substracted!");
-}, 350000);
+}, 3500000);
 
 app.get("/", function (req, res) {
     db.all("SELECT * FROM songs ORDER BY score LIMIT 15 ", function (err, rows) {

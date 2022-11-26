@@ -5,7 +5,7 @@ music
 tempmusic
 tempcover
 package-lock.json
-database.db
+*.db
 
 ### Node ###
 # Logs
